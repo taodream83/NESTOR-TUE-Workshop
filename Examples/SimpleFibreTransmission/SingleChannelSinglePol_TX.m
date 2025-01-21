@@ -26,32 +26,32 @@ S = SeqGen(S,P);
 S = PulseShape(S,P);
 
 %% Resampling, combine WDM channels and scale power
-[S,P] = WDM_Mux(S,P);
+[Smux,P] = WDM_Mux(S,P);
 
 %% Fibre propagation
 fprintf('Fibre channel propagation...\n');
 for ss = 1:P.Link.nspans
     fprintf('Span No %i\n',ss);
-    [S,P] = FibreChannel(S,P);
+    [Smux,P] = FibreChannel(Smux,P);
     if P.Link.EDFA
-        S = EDFA(S,P);
+        Smux = EDFA(Smux,P);
     end
 end
 
 %% Resampling and separate WDM channels
-[S,P] = WDM_DeMux(S,P);
+[Sdmux,P] = WDM_DeMux(Smux,P);
 
 %% Dispersion compensation
-S = EDC(S,P);
+Sedc = EDC(Sdmux,P);
 
 %% Matched filter
-S = MatchedFilter(S,P);
+Smf = MatchedFilter(Sedc,P);
 
 %% Phase Recovery
-S = ConstSync(S,P); 
+Sout = ConstSync(Smf,P); 
 
 %% Calculate metrics before demapping
-R = CalcPerfMetric(R,S,P,'SNR');
+R = CalcPerfMetric(R,Sout,P,'SNR');
 
-heatscatterplot(S.RxSym.EstimatedSymbols);
+heatscatterplot(Sout.RxSym.EstimatedSymbols);
 
