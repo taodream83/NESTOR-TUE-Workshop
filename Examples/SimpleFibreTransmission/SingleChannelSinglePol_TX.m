@@ -41,11 +41,8 @@ end
 %% Resampling and separate WDM channels
 [Sdmux,P] = WDM_DeMux(Smux,P);
 
-%% Dispersion compensation
-Sedc = EDC(Sdmux,P);
-
 %% Matched filter
-Smf = MatchedFilter(Sedc,P);
+Smf = MatchedFilter(Sdmux,P);
 
 %% Phase Recovery
 Sout = ConstSync(Smf,P); 
